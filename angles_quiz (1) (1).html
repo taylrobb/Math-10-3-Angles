@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Angles Quiz — Math 10-3</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F5F0;
+    --card: #FFFFFF;
+    --text: #1A1A1A;
+    --muted: #6B6860;
+    --border: #E0DDD6;
+    --accent: #2B4FFF;
+    --accent-light: #EEF1FF;
+    --green: #1A7A4A;
+    --green-light: #E8F5EE;
+    --red: #C0392B;
+    --red-light: #FDEEEC;
+    --amber: #B45309;
+    --amber-light: #FEF3C7;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── Header ─────────────────────────────────────── */
+  .app-header {
+    background: var(--text);
+    color: #fff;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .app-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.25rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  .app-header .subtitle {
+    font-size: 0.75rem;
+    opacity: 0.5;
+    margin-top: 1px;
+    font-family: 'DM Mono', monospace;
+  }
+  .header-score {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    opacity: 0.8;
+    display: none;
+  }
+
+  /* ── Layout ──────────────────────────────────────── */
+  .main {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── Setup Screen ────────────────────────────────── */
+  #setup-screen {
+    animation: fadeUp 0.4s ease both;
+  }
+  .setup-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.5rem;
+    font-style: italic;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+    line-height: 1.1;
+  }
+  .setup-desc {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+  .section-label {
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    margin-bottom: 2rem;
+  }
+  .topic-card {
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    background: var(--card);
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.875rem;
+    color: var(--text);
+    user-select: none;
+  }
+  .topic-card:hover { border-color: var(--accent); }
+  .topic-card.active { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+  .topic-card .check {
+    width: 18px; height: 18px;
+    border: 1.5px solid currentColor;
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    transition: background 0.15s;
+  }
+  .topic-card.active .check { background: var(--accent); border-color: var(--accent); color: white; }
+
+  .setup-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .setup-row label { font-size: 0.9rem; color: var(--muted); }
+  .q-count-input {
+    width: 80px;
+    padding: 0.5rem 0.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    font-family: 'DM Mono', monospace;
+    font-size: 1rem;
+    background: var(--card);
+    color: var(--text);
+    text-align: center;
+  }
+  .q-count-input:focus { outline: none; border-color: var(--accent); }
+
+  .btn-start {
+    background: var(--text);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 2.5rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.1s;
+    letter-spacing: 0.01em;
+  }
+  .btn-start:hover { opacity: 0.85; }
+  .btn-start:active { transform: scale(0.98); }
+
+  /* ── Progress Bar ────────────────────────────────── */
+  .progress-track {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+  }
+
+  /* ── Stats Row ───────────────────────────────────── */
+  .stats-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+  }
+  .stat-pill {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 1rem;
+    text-align: center;
+  }
+  .stat-pill .num { font-family: 'DM Mono', monospace; font-size: 1.3rem; font-weight: 500; line-height: 1; }
+  .stat-pill .lbl { font-size: 0.7rem; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; }
+  .stat-pill.correct .num { color: var(--green); }
+  .stat-pill.wrong .num { color: var(--red); }
+
+  /* ── Question Card ───────────────────────────────── */
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    margin-bottom: 1rem;
+    animation: fadeUp 0.25s ease both;
+  }
+  .q-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  .q-tag {
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 3px 10px;
+    border-radius: 99px;
+  }
+  .q-num {
+    font-size: 0.75rem;
+    font-family: 'DM Mono', monospace;
+    color: var(--muted);
+  }
+  .q-text {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    color: var(--text);
+  }
+
+  /* SVG diagram */
+  .q-diagram {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+  }
+  .q-diagram svg { max-width: 100%; height: auto; }
+
+  /* Options */
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .opt-btn {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    line-height: 1.4;
+  }
+  .opt-btn:hover:not(:disabled) { border-color: var(--accent); background: var(--accent-light); }
+  .opt-btn:disabled { cursor: default; }
+  .opt-btn.correct { background: var(--green-light); border-color: var(--green); color: var(--green); font-weight: 500; }
+  .opt-btn.wrong { background: var(--red-light); border-color: var(--red); color: var(--red); }
+  .opt-btn.reveal { background: var(--green-light); border-color: var(--green); color: var(--green); }
+
+  /* Feedback */
+  .feedback-box {
+    margin-top: 1rem;
+    padding: 0.9rem 1rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    line-height: 1.55;
+    display: none;
+  }
+  .feedback-box.correct { display: block; background: var(--green-light); color: var(--green); border: 1px solid #A7D9BC; }
+  .feedback-box.wrong { display: block; background: var(--red-light); color: var(--red); border: 1px solid #F0BDB8; }
+  .feedback-label { font-weight: 600; margin-bottom: 2px; }
+
+  /* Nav */
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .btn-nav {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 0.6rem 1.25rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    cursor: pointer;
+    color: var(--text);
+    transition: all 0.15s;
+  }
+  .btn-nav:hover { border-color: var(--text); }
+  .btn-nav:disabled { opacity: 0.3; cursor: default; }
+  .btn-nav.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .btn-nav.primary:hover { opacity: 0.85; }
+  .btn-nav.danger {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+
+  /* ── Score Screen ────────────────────────────────── */
+  #score-screen { display: none; animation: fadeUp 0.4s ease both; }
+  .score-hero {
+    text-align: center;
+    padding: 3rem 1rem 2rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+  .score-fraction {
+    font-family: 'DM Serif Display', serif;
+    font-size: 4rem;
+    line-height: 1;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .score-pct {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .score-msg {
+    font-size: 1rem;
+    color: var(--muted);
+    max-width: 380px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+  .topic-breakdown { margin-bottom: 2rem; }
+  .topic-breakdown h3 {
+    font-size: 0.7rem;
+    font-family: 'DM Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .topic-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .topic-name { font-size: 0.875rem; flex: 1; }
+  .topic-bar-wrap { width: 120px; height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .topic-bar-fill { height: 100%; border-radius: 2px; transition: width 0.6s ease; }
+  .topic-pct { font-family: 'DM Mono', monospace; font-size: 0.8rem; min-width: 38px; text-align: right; }
+  .score-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  /* ── Animations ──────────────────────────────────── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Responsive ──────────────────────────────────── */
+  @media (max-width: 520px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .topic-grid { grid-template-columns: 1fr 1fr; }
+    .setup-title { font-size: 1.8rem; }
+    .stats-row { gap: 6px; }
+    .main { padding: 1.25rem 1rem 3rem; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <div class="app-header h1" style="font-family:'DM Serif Display',serif;font-style:italic;font-size:1.1rem;">Angles Quiz</div>
+    <div class="subtitle">Math 10-3 · Unit 2A</div>
+  </div>
+  <div class="header-score" id="header-score"></div>
+</header>
+
+<main class="main">
+
+  <!-- ══ SETUP SCREEN ══════════════════════════════════ -->
+  <div id="setup-screen">
+    <h2 class="setup-title">Let's practise<br>angles.</h2>
+    <p class="setup-desc">Choose your topics and number of questions, then start.</p>
+
+    <div class="section-label">Topics</div>
+    <div class="topic-grid" id="topic-toggles">
+      <div class="topic-card active" data-topic="types" onclick="toggleTopic(this)">
+        <span class="check">✓</span> Angle types
+      </div>
+      <div class="topic-card active" data-topic="naming" onclick="toggleTopic(this)">
+        <span class="check">✓</span> Naming &amp; parts
+      </div>
+      <div class="topic-card active" data-topic="comp-supp" onclick="toggleTopic(this)">
+        <span class="check">✓</span> Complementary &amp; supplementary
+      </div>
+      <div class="topic-card active" data-topic="vertical" onclick="toggleTopic(this)">
+        <span class="check">✓</span> Vertically opposite
+      </div>
+      <div class="topic-card active" data-topic="triangle" onclick="toggleTopic(this)">
+        <span class="check">✓</span> Triangle &amp; quadrilateral
+      </div>
+      <div class="topic-card active" data-topic="transversal" onclick="toggleTopic(this)">
+        <span class="check">✓</span> Parallel lines &amp; transversals
+      </div>
+      <div class="topic-card active" data-topic="reflex" onclick="toggleTopic(this)">
+        <span class="check">✓</span> Reflex angles
+      </div>
+    </div>
+
+    <div class="setup-row">
+      <label for="q-count">Number of questions:</label>
+      <input class="q-count-input" type="number" id="q-count" value="100" min="10" max="100" step="10" />
+    </div>
+
+    <button class="btn-start" onclick="startQuiz()">Start quiz →</button>
+  </div>
+
+  <!-- ══ QUIZ SCREEN ═══════════════════════════════════ -->
+  <div id="quiz-screen" style="display:none;">
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+
+    <div class="stats-row">
+      <div class="stat-pill correct">
+        <div class="num" id="stat-correct">0</div>
+        <div class="lbl">Correct</div>
+      </div>
+      <div class="stat-pill wrong">
+        <div class="num" id="stat-wrong">0</div>
+        <div class="lbl">Wrong</div>
+      </div>
+      <div class="stat-pill">
+        <div class="num" id="stat-remain">—</div>
+        <div class="lbl">Left</div>
+      </div>
+    </div>
+
+    <div class="question-card" id="question-card">
+      <div class="q-meta">
+        <span class="q-tag" id="q-tag"></span>
+        <span class="q-num" id="q-num"></span>
+      </div>
+      <div class="q-text" id="q-text"></div>
+      <div class="q-diagram" id="q-diagram" style="display:none;"></div>
+      <div class="options-grid" id="options"></div>
+      <div class="feedback-box" id="feedback"></div>
+    </div>
+
+    <div class="nav-row">
+      <button class="btn-nav" id="btn-prev" onclick="prevQ()">← Prev</button>
+      <button class="btn-nav danger" onclick="endQuiz()">Finish &amp; score</button>
+      <button class="btn-nav primary" id="btn-next" onclick="nextQ()" style="display:none;">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══ SCORE SCREEN ══════════════════════════════════ -->
+  <div id="score-screen">
+    <div class="score-hero">
+      <div class="score-fraction" id="score-fraction"></div>
+      <div class="score-pct" id="score-pct"></div>
+      <div class="score-msg" id="score-msg"></div>
+    </div>
+    <div class="topic-breakdown">
+      <h3>Score by topic</h3>
+      <div id="topic-rows"></div>
+    </div>
+    <div class="score-actions">
+      <button class="btn-start" onclick="restartSame()">Try again</button>
+      <button class="btn-nav" onclick="showSetup()" style="padding:.85rem 1.5rem;">Change topics</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  UTILITIES
+// ══════════════════════════════════════════════════════
+function rnd(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function deg2rad(d) { return d * Math.PI / 180; }
+
+// Generate 3 wrong answers different from correct
+function wrongAnswers(correct, generate) {
+  const s = new Set([String(correct)]);
+  let tries = 0;
+  while (s.size < 4 && tries < 200) {
+    tries++;
+    const v = generate();
+    if (v !== null && String(v) !== String(correct)) s.add(String(v));
+  }
+  return shuffle([...s]).slice(0, 4);
+}
+
+function numWrong(correct, step = 10, min = 1, max = 359) {
+  return wrongAnswers(correct, () => {
+    const offsets = [-3*step, -2*step, -step, step, 2*step, 3*step];
+    const v = correct + pick(offsets);
+    return v >= min && v <= max && v !== correct ? v : null;
+  });
+}
+
+// ══════════════════════════════════════════════════════
+//  SVG HELPERS  (all geometrically accurate)
+// ══════════════════════════════════════════════════════
+
+// Draw a single angle: one arm along positive x, second arm at angleDeg
+// origin at (ox, oy), arm length = armLen
+function svgAngle(angleDeg, label, opts = {}) {
+  const W = opts.W || 220, H = opts.H || 160;
+  const ox = opts.ox || W / 2, oy = opts.oy || H * 0.72;
+  const L = opts.L || 80;   // arm length
+  const arcR = opts.arcR || 28;
+  const col = opts.col || '#2B4FFF';
+  const col2 = opts.col2 || col;
+
+  // Arm 1: along positive x (→)
+  const x1 = ox + L, y1 = oy;
+  // Arm 2: measured counter-clockwise from positive x
+  const rad = deg2rad(angleDeg);
+  const x2 = ox + L * Math.cos(-rad);  // SVG y is flipped
+  const y2 = oy + L * Math.sin(-rad);  // so -rad gives counter-clockwise on screen
+
+  // Arc path
+  const ax1 = ox + arcR;
+  const ay1 = oy;
+  const ax2 = ox + arcR * Math.cos(-rad);
+  const ay2 = oy + arcR * Math.sin(-rad);
+  const largeArc = angleDeg > 180 ? 1 : 0;
+  // always sweep counter-clockwise in SVG coords (sweep=0)
+  const arcPath = `M ${ax1} ${ay1} A ${arcR} ${arcR} 0 ${largeArc} 0 ${ax2} ${ay2}`;
+
+  // Label position: bisector of the angle, outside arc
+  const bisRad = deg2rad(angleDeg / 2);
+  const lblR = arcR + 16;
+  const lblX = ox + lblR * Math.cos(-bisRad);
+  const lblY = oy + lblR * Math.sin(-bisRad);
+
+  // Right-angle box if 90°
+  let rightBox = '';
+  if (angleDeg === 90) {
+    const s = 12;
+    rightBox = `<polyline points="${ox+s},${oy} ${ox+s},${oy-s} ${ox},${oy-s}" fill="none" stroke="${col}" stroke-width="1.5"/>`;
+  }
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <line x1="${ox}" y1="${oy}" x2="${x1}" y2="${y1}" stroke="${col}" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="${ox}" y1="${oy}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" stroke="${col2}" stroke-width="2.5" stroke-linecap="round"/>
+    ${angleDeg !== 90 ? `<path d="${arcPath}" fill="none" stroke="#888" stroke-width="1.5"/>` : ''}
+    ${rightBox}
+    <text x="${lblX.toFixed(2)}" y="${(lblY + 4).toFixed(2)}" text-anchor="middle" font-size="13" fill="#444" font-family="'DM Mono',monospace">${label}</text>
+  </svg>`;
+}
+
+// Two intersecting lines forming vertically opposite angles
+function svgCross(a) {
+  const W = 220, H = 180;
+  const cx = 110, cy = 90;
+  const L = 75;
+  const b = 180 - a;
+  const rad = deg2rad(a);
+
+  // Line 1: horizontal
+  const lx1 = cx - L, ly1 = cy, lx2 = cx + L, ly2 = cy;
+  // Line 2: at angle a from horizontal
+  const mx1 = cx - L * Math.cos(rad), my1 = cy + L * Math.sin(rad);
+  const mx2 = cx + L * Math.cos(rad), my2 = cy - L * Math.sin(rad);
+
+  const arcR = 22;
+  function arcPath(startDeg, sweepDeg) {
+    const s = deg2rad(startDeg);
+    const e = deg2rad(startDeg + sweepDeg);
+    const x1 = cx + arcR * Math.cos(s), y1 = cy - arcR * Math.sin(s);
+    const x2 = cx + arcR * Math.cos(e), y2 = cy - arcR * Math.sin(e);
+    const lg = sweepDeg > 180 ? 1 : 0;
+    return `M ${x1.toFixed(1)} ${y1.toFixed(1)} A ${arcR} ${arcR} 0 ${lg} 0 ${x2.toFixed(1)} ${y2.toFixed(1)}`;
+  }
+
+  function labelPos(midDeg, r) {
+    const rad = deg2rad(midDeg);
+    return { x: cx + r * Math.cos(rad), y: cy - r * Math.sin(rad) };
+  }
+
+  const lp1 = labelPos(a / 2, arcR + 14);
+  const lp2 = labelPos(180 + a / 2, arcR + 14);
+  const lp3 = labelPos(a + b / 2, arcR + 14);
+  const lp4 = labelPos(180 + a + b / 2, arcR + 14);
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <line x1="${lx1}" y1="${ly1}" x2="${lx2}" y2="${ly2}" stroke="#2B4FFF" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="${mx1.toFixed(1)}" y1="${my1.toFixed(1)}" x2="${mx2.toFixed(1)}" y2="${my2.toFixed(1)}" stroke="#2B4FFF" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="${arcPath(0, a)}" fill="none" stroke="#f97316" stroke-width="1.5"/>
+    <path d="${arcPath(180, a)}" fill="none" stroke="#f97316" stroke-width="1.5"/>
+    <path d="${arcPath(a, b)}" fill="none" stroke="#888" stroke-width="1.5"/>
+    <path d="${arcPath(180 + a, b)}" fill="none" stroke="#888" stroke-width="1.5"/>
+    <text x="${lp1.x.toFixed(1)}" y="${(lp1.y + 4).toFixed(1)}" text-anchor="middle" font-size="12" fill="#f97316" font-family="'DM Mono',monospace">${a}°</text>
+    <text x="${lp2.x.toFixed(1)}" y="${(lp2.y + 4).toFixed(1)}" text-anchor="middle" font-size="12" fill="#f97316" font-family="'DM Mono',monospace">${a}°</text>
+    <text x="${lp3.x.toFixed(1)}" y="${(lp3.y + 4).toFixed(1)}" text-anchor="middle" font-size="12" fill="#888" font-family="'DM Mono',monospace">${b}°</text>
+    <text x="${lp4.x.toFixed(1)}" y="${(lp4.y + 4).toFixed(1)}" text-anchor="middle" font-size="12" fill="#888" font-family="'DM Mono',monospace">${b}°</text>
+  </svg>`;
+}
+
+// Two parallel lines cut by a transversal
+// Angles at top intersection: a (right of transversal above line), b=180-a (left)
+// Parallel line tick marks shown
+function svgParallel(a, showLabels = true, highlightType = 'none') {
+  const W = 260, H = 190;
+  const b = 180 - a;
+  // Lines run horizontally. Top line y=65, bottom y=135.
+  // Transversal goes from upper-left to lower-right.
+  const tRad = deg2rad(55); // fixed transversal angle ~55° from horizontal gives nice visuals
+  const L = 120;
+  // Intersection points
+  const ix1 = 110, iy1 = 65;   // top
+  const ix2 = 150, iy2 = 135;  // bottom (offset to show diagonal transversal)
+
+  // Actually: place both intersections so transversal is a straight line
+  // Use a fixed slope for the transversal: slope = tan(35°) ≈ 0.7 upward to right
+  // Transversal: passes through (100, 145) with angle (180-a)° from horizontal
+  const slope = Math.tan(deg2rad(180 - a));
+  // Top line: y = 60, Bottom line: y = 130
+  // Transversal x at y=60: x = x0 + (60 - y0)/slope
+  const ty1 = 60, ty2 = 130;
+  const tx0 = 110, tyb = 140;
+  // Line through (tx0, tyb) with given slope
+  const tx1 = tx0 + (ty1 - tyb) / slope;
+  const tx2 = tx0 + (ty2 - tyb) / slope;
+
+  // Line endpoints
+  const lineLen = 100;
+
+  // Tick marks on parallel lines
+  function tick(x, y, angle) {
+    const r = 8, dx = r * Math.cos(deg2rad(angle)), dy = r * Math.sin(deg2rad(angle));
+    return `<line x1="${(x-dx).toFixed(1)}" y1="${(y-dy).toFixed(1)}" x2="${(x+dx).toFixed(1)}" y2="${(y+dy).toFixed(1)}" stroke="#1A1A1A" stroke-width="1.5"/>`;
+  }
+
+  // Arc at intersection
+  function intArc(ix, iy, startDeg, sweepDeg, color, r = 20) {
+    const s = deg2rad(startDeg);
+    const e = deg2rad(startDeg + sweepDeg);
+    const ax1 = ix + r * Math.cos(s), ay1 = iy - r * Math.sin(s);
+    const ax2 = ix + r * Math.cos(e), ay2 = iy - r * Math.sin(e);
+    const lg = sweepDeg > 180 ? 1 : 0;
+    return `<path d="M ${ax1.toFixed(1)} ${ay1.toFixed(1)} A ${r} ${r} 0 ${lg} 0 ${ax2.toFixed(1)} ${ay2.toFixed(1)}" fill="none" stroke="${color}" stroke-width="1.5"/>`;
+  }
+
+  function intLabel(ix, iy, midDeg, r, text, color) {
+    const lx = ix + r * Math.cos(deg2rad(midDeg));
+    const ly = iy - r * Math.sin(deg2rad(midDeg));
+    return `<text x="${lx.toFixed(1)}" y="${(ly + 4).toFixed(1)}" text-anchor="middle" font-size="11" fill="${color}" font-family="'DM Mono',monospace">${text}</text>`;
+  }
+
+  // The angle 'a' is from positive x to the transversal direction at top intersection
+  // At top intersection: transversal goes at angle (180-a) from +x going right
+  // Angles formed:
+  // Above right: a° (between +x direction and transversal going upper-right) — but we measure differently
+  // Let's define: transversal hits top line. Right of transversal above = a, below = 180-a=b
+  // At each intersection the 4 angles are: a, b, a, b (vert opp pairs)
+
+  const transAngle = a; // angle on the right between the right-going line and the upward transversal
+
+  // Colors based on highlight
+  const colorMap = {
+    'alt-int': { top_below_right: '#1A7A4A', bot_above_left: '#1A7A4A', default: '#bbb' },
+    'corr': { top_above_right: '#1A7A4A', bot_above_right: '#1A7A4A', default: '#bbb' },
+    'co-int': { top_below_right: '#B45309', bot_above_right: '#B45309', default: '#bbb' },
+    'none': { all: '#2B4FFF' }
+  };
+
+  const arcColor = highlightType === 'none' ? '#f97316' : '#ccc';
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <line x1="20" y1="${ty1}" x2="230" y2="${ty1}" stroke="#2B4FFF" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="20" y1="${ty2}" x2="230" y2="${ty2}" stroke="#2B4FFF" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="${(tx1-30).toFixed(1)}" y1="${ty1-20}" x2="${(tx2+30).toFixed(1)}" y2="${ty2+20}" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+    ${tick(130, ty1, 90)}${tick(137, ty1, 90)}
+    ${tick(130, ty2, 90)}${tick(137, ty2, 90)}
+    ${intArc(tx1, ty1, 0, a, '#1A7A4A')}
+    ${intArc(tx1, ty1, a, b, '#888')}
+    ${intArc(tx1, ty1, 180, a, '#1A7A4A')}
+    ${intArc(tx1, ty1, 180+a, b, '#888')}
+    ${intArc(tx2, ty2, 0, a, '#1A7A4A')}
+    ${intArc(tx2, ty2, a, b, '#888')}
+    ${intArc(tx2, ty2, 180, a, '#1A7A4A')}
+    ${intArc(tx2, ty2, 180+a, b, '#888')}
+    ${showLabels ? intLabel(tx1, ty1, a/2, 30, a+'°', '#1A7A4A') : ''}
+    ${showLabels ? intLabel(tx1, ty1, a+b/2, 28, b+'°', '#888') : ''}
+    ${showLabels ? intLabel(tx2, ty2, a/2, 30, a+'°', '#1A7A4A') : ''}
+    ${showLabels ? intLabel(tx2, ty2, a+b/2, 28, b+'°', '#888') : ''}
+    <text x="235" y="${ty1+4}" font-size="11" fill="#2B4FFF" font-family="'DM Sans',sans-serif">l₁</text>
+    <text x="235" y="${ty2+4}" font-size="11" fill="#2B4FFF" font-family="'DM Sans',sans-serif">l₂</text>
+  </svg>`;
+}
+
+// Triangle with two known angles, third marked ?
+function svgTriangle(a, b) {
+  const W = 220, H = 170;
+  const c = 180 - a - b;
+  // Place triangle with base at bottom
+  // Vertices: bottom-left = A (angle a), bottom-right = B (angle b), top = C (angle c)
+  const ax = 30, ay = 140;
+  const bx = 190, by = 140;
+  // Position top vertex using angles: 
+  // base = bx - ax, use law of sines
+  const base = bx - ax;
+  const aRad = deg2rad(a), bRad = deg2rad(b);
+  const h = base * Math.sin(aRad) * Math.sin(bRad) / Math.sin(deg2rad(c));
+  const cx2 = ax + base * Math.sin(bRad) / Math.sin(deg2rad(c)) * Math.cos(aRad);
+  const cy2 = ay - h;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="${ax},${ay} ${bx},${by} ${cx2.toFixed(1)},${cy2.toFixed(1)}" fill="#EEF1FF" stroke="#2B4FFF" stroke-width="2" stroke-linejoin="round"/>
+    <text x="${ax-4}" y="${ay+16}" text-anchor="middle" font-size="12" fill="#444" font-family="'DM Mono',monospace">${a}°</text>
+    <text x="${bx+4}" y="${by+16}" text-anchor="end" font-size="12" fill="#444" font-family="'DM Mono',monospace">${b}°</text>
+    <text x="${cx2.toFixed(1)}" y="${(cy2 - 8).toFixed(1)}" text-anchor="middle" font-size="13" fill="#2B4FFF" font-weight="600" font-family="'DM Mono',monospace">?</text>
+  </svg>`;
+}
+
+// Quadrilateral with three known angles, fourth marked ?
+function svgQuad(a, b, cc) {
+  const W = 220, H = 170;
+  // Irregular quad - 4 points
+  const pts = [[30, 130], [190, 125], [165, 30], [55, 20]];
+  const labels = [a, b, cc, '?'];
+  const offsets = [[-8,14],[12,14],[12,-8],[-8,-8]];
+  const anchors = ['end','start','start','end'];
+  const ptStr = pts.map(p => p.join(',')).join(' ');
+
+  const lbls = pts.map((p, i) => `<text x="${p[0]+offsets[i][0]}" y="${p[1]+offsets[i][1]}" text-anchor="${anchors[i]}" font-size="12" fill="${i===3?'#2B4FFF':'#444'}" font-family="'DM Mono',monospace" font-weight="${i===3?'600':'400'}">${labels[i]}${i<3?'°':''}</text>`).join('');
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="${ptStr}" fill="#EEF1FF" stroke="#2B4FFF" stroke-width="2" stroke-linejoin="round"/>
+    ${lbls}
+  </svg>`;
+}
+
+// Supplementary angles on a straight line
+function svgSupp(a) {
+  const b = 180 - a;
+  const W = 240, H = 120;
+  const ox = 90, oy = 80;
+  const L = 85;
+  const aRad = deg2rad(a);
+  const vx = ox + L * Math.cos(aRad), vy = oy - L * Math.sin(aRad);
+  const arcR = 28;
+  const ax1 = ox + arcR, ay1 = oy;
+  const ax2 = ox + arcR * Math.cos(aRad), ay2 = oy - arcR * Math.sin(aRad);
+  const bx1 = ox - arcR, by1 = oy;
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <line x1="10" y1="${oy}" x2="${W-10}" y2="${oy}" stroke="#2B4FFF" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="${ox}" y1="${oy}" x2="${vx.toFixed(1)}" y2="${vy.toFixed(1)}" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M ${ax1} ${ay1} A ${arcR} ${arcR} 0 0 0 ${ax2.toFixed(1)} ${ay2.toFixed(1)}" fill="none" stroke="#1A7A4A" stroke-width="1.5"/>
+    <path d="M ${bx1} ${by1} A ${arcR} ${arcR} 0 0 1 ${ax2.toFixed(1)} ${ay2.toFixed(1)}" fill="none" stroke="#888" stroke-width="1.5"/>
+    <text x="${(ox + 45).toFixed(1)}" y="${(oy - 12).toFixed(1)}" text-anchor="middle" font-size="12" fill="#1A7A4A" font-family="'DM Mono',monospace">${a}°</text>
+    <text x="${(ox - 40).toFixed(1)}" y="${(oy - 12).toFixed(1)}" text-anchor="middle" font-size="12" fill="#888" font-family="'DM Mono',monospace">?</text>
+  </svg>`;
+}
+
+// Complementary angles (right angle box shown)
+function svgComp(a) {
+  const b = 90 - a;
+  const W = 180, H = 150;
+  const ox = 40, oy = 110;
+  const L = 75;
+  const aRad = deg2rad(a);
+  const vx = ox + L * Math.cos(aRad), vy = oy - L * Math.sin(aRad);
+  const arcR = 24;
+  const s = 14; // right angle box size
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <line x1="${ox}" y1="${oy}" x2="${ox+L}" y2="${oy}" stroke="#2B4FFF" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="${ox}" y1="${oy}" x2="${ox}" y2="${oy-L}" stroke="#2B4FFF" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="${ox}" y1="${oy}" x2="${vx.toFixed(1)}" y2="${vy.toFixed(1)}" stroke="#f97316" stroke-width="2.5" stroke-linecap="round"/>
+    <polyline points="${ox+s},${oy} ${ox+s},${oy-s} ${ox},${oy-s}" fill="none" stroke="#2B4FFF" stroke-width="1.5"/>
+    <path d="M ${ox+arcR} ${oy} A ${arcR} ${arcR} 0 0 0 ${(ox+arcR*Math.cos(aRad)).toFixed(1)} ${(oy-arcR*Math.sin(aRad)).toFixed(1)}" fill="none" stroke="#1A7A4A" stroke-width="1.5"/>
+    <path d="M ${(ox+arcR*Math.cos(aRad)).toFixed(1)} ${(oy-arcR*Math.sin(aRad)).toFixed(1)} A ${arcR} ${arcR} 0 0 0 ${ox} ${oy-arcR}" fill="none" stroke="#888" stroke-width="1.5"/>
+    <text x="${(ox + arcR + 18).toFixed(1)}" y="${(oy - 8).toFixed(1)}" font-size="12" fill="#1A7A4A" font-family="'DM Mono',monospace">${a}°</text>
+    <text x="${(ox + 8).toFixed(1)}" y="${(oy - arcR - 8).toFixed(1)}" font-size="12" fill="#888" font-family="'DM Mono',monospace">?</text>
+  </svg>`;
+}
+
+// Reflex angle: shows both the inner angle and the outer reflex arc
+function svgReflex(inner) {
+  const reflex = 360 - inner;
+  const W = 220, H = 170;
+  const ox = 110, oy = 100;
+  const L = 70;
+  const rad = deg2rad(inner);
+  const x2 = ox + L * Math.cos(-rad);
+  const y2 = oy + L * Math.sin(-rad);
+
+  // Reflex arc (large arc going clockwise = the outer sweep)
+  const arcR = 50;
+  const ax1 = ox + arcR, ay1 = oy;
+  const ax2 = ox + arcR * Math.cos(-rad), ay2 = oy + arcR * Math.sin(-rad);
+
+  // Inner arc (small, counter-clockwise)
+  const irR = 22;
+  const ix2 = ox + irR * Math.cos(-rad), iy2 = oy + irR * Math.sin(-rad);
+
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
+    <line x1="${ox}" y1="${oy}" x2="${ox+L}" y2="${oy}" stroke="#2B4FFF" stroke-width="2.5" stroke-linecap="round"/>
+    <line x1="${ox}" y1="${oy}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#2B4FFF" stroke-width="2.5" stroke-linecap="round"/>
+    <path d="M ${ax1} ${ay1} A ${arcR} ${arcR} 0 1 1 ${ax2.toFixed(1)} ${ay2.toFixed(1)}" fill="none" stroke="#f97316" stroke-width="2" stroke-dasharray="4,3"/>
+    <path d="M ${ox+irR} ${oy} A ${irR} ${irR} 0 0 0 ${ix2.toFixed(1)} ${iy2.toFixed(1)}" fill="none" stroke="#888" stroke-width="1.5"/>
+    <text x="${ox+irR+22}" y="${oy+4}" font-size="11" fill="#888" font-family="'DM Mono',monospace">${inner}°</text>
+    <text x="${(ox - 28).toFixed(1)}" y="${(oy - arcR + 15).toFixed(1)}" font-size="12" fill="#f97316" font-family="'DM Mono',monospace">${reflex}°</text>
+    <text x="${ox-10}" y="${oy-55}" font-size="10" fill="#888" font-family="'DM Sans',sans-serif" font-style="italic">reflex angle</text>
+  </svg>`;
+}
+
+// ══════════════════════════════════════════════════════
+//  QUESTION GENERATORS
+// ══════════════════════════════════════════════════════
+
+function qTypes() {
+  const type = pick(['identify-from-degrees', 'identify-from-diagram', 'definition']);
+  if (type === 'identify-from-degrees') {
+    const cases = [
+      { range: [1,89], name: 'Acute', def: 'between 0° and 90°' },
+      { range: [90,90], name: 'Right', def: 'exactly 90°' },
+      { range: [91,179], name: 'Obtuse', def: 'between 90° and 180°' },
+      { range: [180,180], name: 'Straight', def: 'exactly 180°' },
+      { range: [181,359], name: 'Reflex', def: 'greater than 180°' },
+    ];
+    const c = pick(cases);
+    const angle = c.range[0] === c.range[1] ? c.range[0] : rnd(c.range[0], c.range[1]);
+    return {
+      topic: 'Angle types', topicKey: 'types',
+      text: `An angle measures ${angle}°. What type of angle is it?`,
+      svg: angle <= 180 ? svgAngle(angle, angle + '°') : null,
+      options: shuffle(['Acute','Obtuse','Right','Straight','Reflex']).slice(0,4).includes(c.name)
+        ? shuffle(['Acute','Obtuse','Right','Straight','Reflex']).filter((v,i,a)=>a.indexOf(v)===i).slice(0,3).concat([c.name]).filter((v,i,a)=>a.indexOf(v)===i).slice(0,4)
+        : shuffle(['Acute','Obtuse','Right','Straight']).slice(0,3).concat([c.name]),
+      answer: c.name,
+      explanation: `${angle}° is ${c.def}, so it is a${c.name[0]==='A'||c.name[0]==='O'?' an':' a'} ${c.name} angle.`
+    };
+  }
+  if (type === 'identify-from-diagram') {
+    const cases2 = [
+      { deg: rnd(20,80), name: 'Acute' },
+      { deg: 90, name: 'Right' },
+      { deg: rnd(100,170), name: 'Obtuse' },
+    ];
+    const c = pick(cases2);
+    return {
+      topic: 'Angle types', topicKey: 'types',
+      text: 'What type of angle is shown in the diagram?',
+      svg: svgAngle(c.deg, c.deg + '°'),
+      options: shuffle(['Acute','Obtuse','Right','Straight']),
+      answer: c.name,
+      explanation: `The angle is ${c.deg}°, which is ${c.name === 'Acute' ? 'less than 90°' : c.name === 'Right' ? 'exactly 90°' : 'between 90° and 180°'} — a${c.name[0]==='A'||c.name[0]==='O'?'n':''} ${c.name} angle.`
+    };
+  }
+  // definition
+  const defs = [
+    { q: 'Which type of angle measures exactly 90°?', ans: 'Right', opts: ['Acute','Right','Obtuse','Straight'] },
+    { q: 'Which type of angle measures exactly 180°?', ans: 'Straight', opts: ['Right','Obtuse','Straight','Reflex'] },
+    { q: 'Which type of angle is less than 90°?', ans: 'Acute', opts: ['Acute','Right','Obtuse','Straight'] },
+    { q: 'Which type of angle is between 90° and 180°?', ans: 'Obtuse', opts: ['Acute','Right','Obtuse','Straight'] },
+    { q: 'Which type of angle is greater than 180°?', ans: 'Reflex', opts: ['Obtuse','Straight','Reflex','Full'] },
+  ];
+  const d = pick(defs);
+  return { topic: 'Angle types', topicKey: 'types', text: d.q, svg: null, options: d.opts, answer: d.ans, explanation: '' };
+}
+
+function qNaming() {
+  const pool = 'ABCDEFGHJKLMNPQRSTUVWXYZ'.split('');
+  const [p, q, r] = shuffle(pool).slice(0,3);
+  const qs = [
+    { text: `An angle has vertex at ${q}, with arms pointing to ${p} and ${r}. Which name is correct?`,
+      ans: `∠${p}${q}${r}`, opts: shuffle([`∠${p}${q}${r}`, `∠${p}${r}${q}`, `∠${q}${p}${r}`, `∠${r}${p}${q}`]),
+      exp: `The vertex is always the middle letter. Vertex is ${q}, so: ∠${p}${q}${r} or ∠${r}${q}${p}.` },
+    { text: `Which is another valid name for ∠${p}${q}${r}?`,
+      ans: `∠${r}${q}${p}`, opts: shuffle([`∠${r}${q}${p}`, `∠${p}${r}${q}`, `∠${q}${p}${r}`, `∠${q}${r}${p}`]),
+      exp: `An angle can be written with letters reversed — the vertex ${q} stays in the middle.` },
+    { text: `In ∠${p}${q}${r}, which letter represents the vertex?`,
+      ans: q, opts: shuffle([p, q, r, pool[3]]),
+      exp: `The vertex is always the middle letter in a three-letter angle name.` },
+    { text: `What is the point where the two arms of an angle meet called?`,
+      ans: 'Vertex', opts: shuffle(['Vertex','Origin','Midpoint','Intersection']),
+      exp: `The point where the two arms (rays) of an angle meet is called the vertex.` },
+    { text: `The two rays that form an angle are called:`,
+      ans: 'Arms', opts: shuffle(['Arms','Sides','Legs','Edges']),
+      exp: `The two rays of an angle are called the arms (or sometimes sides or rays).` },
+  ];
+  const item = pick(qs);
+  return { topic: 'Naming & parts', topicKey: 'naming', text: item.text, svg: null, options: item.opts.slice(0,4), answer: item.ans, explanation: item.exp };
+}
+
+function qCompSupp() {
+  const type = pick(['find-comp', 'find-supp', 'find-original-from-comp', 'find-original-from-supp', 'concept', 'visual-comp', 'visual-supp']);
+
+  if (type === 'visual-comp') {
+    const a = rnd(15, 75);
+    const b = 90 - a;
+    return { topic: 'Complementary angles', topicKey: 'comp-supp',
+      text: `The diagram shows two complementary angles. One is ${a}°. What is the other?`,
+      svg: svgComp(a), options: numWrong(b, 10, 1, 89), answer: b,
+      explanation: `Complementary angles add to 90°. So 90° − ${a}° = ${b}°.` };
+  }
+  if (type === 'visual-supp') {
+    const a = rnd(20, 160);
+    const b = 180 - a;
+    return { topic: 'Supplementary angles', topicKey: 'comp-supp',
+      text: `The diagram shows two supplementary angles. One is ${a}°. What is the other?`,
+      svg: svgSupp(a), options: numWrong(b, 15, 1, 179), answer: b,
+      explanation: `Supplementary angles add to 180°. So 180° − ${a}° = ${b}°.` };
+  }
+  if (type === 'find-comp') {
+    const a = rnd(5, 85);
+    const b = 90 - a;
+    return { topic: 'Complementary angles', topicKey: 'comp-supp',
+      text: `An angle measures ${a}°. What is its complement?`,
+      svg: null, options: numWrong(b, 10, 1, 89), answer: b,
+      explanation: `Complement = 90° − ${a}° = ${b}°.` };
+  }
+  if (type === 'find-supp') {
+    const a = rnd(10, 170);
+    const b = 180 - a;
+    return { topic: 'Supplementary angles', topicKey: 'comp-supp',
+      text: `An angle measures ${a}°. What is its supplement?`,
+      svg: null, options: numWrong(b, 15, 1, 179), answer: b,
+      explanation: `Supplement = 180° − ${a}° = ${b}°.` };
+  }
+  if (type === 'find-original-from-comp') {
+    const comp = rnd(5, 85);
+    const a = 90 - comp;
+    return { topic: 'Complementary angles', topicKey: 'comp-supp',
+      text: `The complement of an angle is ${comp}°. What is the original angle?`,
+      svg: null, options: numWrong(a, 10, 1, 89), answer: a,
+      explanation: `If the complement is ${comp}°, original = 90° − ${comp}° = ${a}°.` };
+  }
+  if (type === 'find-original-from-supp') {
+    const supp = rnd(10, 170);
+    const a = 180 - supp;
+    return { topic: 'Supplementary angles', topicKey: 'comp-supp',
+      text: `The supplement of an angle is ${supp}°. What is the original angle?`,
+      svg: null, options: numWrong(a, 15, 1, 179), answer: a,
+      explanation: `If the supplement is ${supp}°, original = 180° − ${supp}° = ${a}°.` };
+  }
+  const concepts = [
+    { q: 'Complementary angles always sum to:', ans: '90°', opts: ['90°','180°','270°','360°'], exp: 'Complementary = 90° total.' },
+    { q: 'Supplementary angles always sum to:', ans: '180°', opts: ['90°','180°','270°','360°'], exp: 'Supplementary = 180° total.' },
+    { q: 'Can an obtuse angle have a complement?', ans: 'No', opts: ['Yes','No','Sometimes','Only if acute'], exp: 'The complement would be negative, which is impossible.' },
+    { q: 'Two angles of 60° and 30° are:', ans: 'Complementary', opts: ['Complementary','Supplementary','Vertically opposite','Equal'], exp: '60° + 30° = 90°, so they are complementary.' },
+    { q: 'Two angles of 110° and 70° are:', ans: 'Supplementary', opts: ['Complementary','Supplementary','Vertically opposite','Equal'], exp: '110° + 70° = 180°, so they are supplementary.' },
+  ];
+  const c = pick(concepts);
+  return { topic: 'Complementary & supplementary', topicKey: 'comp-supp', text: c.q, svg: null, options: c.opts, answer: c.ans, explanation: c.exp };
+}
+
+function qVertical() {
+  const type = pick(['find-opp', 'find-adj', 'concept', 'visual-find']);
+
+  if (type === 'visual-find' || type === 'find-opp') {
+    const a = rnd(25, 155);
+    const b = 180 - a;
+    return { topic: 'Vertically opposite angles', topicKey: 'vertical',
+      text: `Two straight lines cross forming four angles. One angle is ${a}°. What is the vertically opposite angle?`,
+      svg: svgCross(a), options: numWrong(a, 15, 1, 179), answer: a,
+      explanation: `Vertically opposite angles are equal. The opposite angle is also ${a}°.` };
+  }
+  if (type === 'find-adj') {
+    const a = rnd(25, 155);
+    const b = 180 - a;
+    return { topic: 'Vertically opposite angles', topicKey: 'vertical',
+      text: `Two lines cross. One angle is ${a}°. What is an adjacent angle?`,
+      svg: svgCross(a), options: numWrong(b, 15, 1, 179), answer: b,
+      explanation: `Adjacent angles on a straight line are supplementary: 180° − ${a}° = ${b}°.` };
+  }
+  const concepts = [
+    { q: 'When two straight lines intersect, vertically opposite angles are:', ans: 'Equal', opts: ['Equal','Supplementary','Complementary','Add to 360°'], exp: 'Vertically opposite angles are always equal.' },
+    { q: 'When two lines cross, how many pairs of vertically opposite angles are formed?', ans: '2 pairs', opts: ['1 pair','2 pairs','3 pairs','4 pairs'], exp: 'Two intersecting lines form two pairs of vertically opposite angles.' },
+    { q: 'Two intersecting lines form an angle of 47°. What is the angle directly across from it?', ans: '47°', opts: numWrong(47, 15, 1, 179), exp: 'Vertically opposite angles are equal, so it is also 47°.' },
+  ];
+  const c = pick(concepts);
+  return { topic: 'Vertically opposite angles', topicKey: 'vertical', text: c.q, svg: null, options: c.opts.slice(0,4), answer: c.ans, explanation: c.exp };
+}
+
+function qTriangle() {
+  const type = pick(['tri-find', 'quad-find', 'tri-concept', 'quad-concept', 'tri-visual', 'quad-visual']);
+
+  if (type === 'tri-find' || type === 'tri-visual') {
+    let a, b, c;
+    do { a = rnd(20, 80); b = rnd(20, 80); c = 180 - a - b; } while (c < 15);
+    return { topic: 'Angles in a triangle', topicKey: 'triangle',
+      text: `A triangle has two angles measuring ${a}° and ${b}°. What is the third angle?`,
+      svg: svgTriangle(a, b), options: numWrong(c, 15, 1, 178), answer: c,
+      explanation: `Angles in a triangle sum to 180°. So 180° − ${a}° − ${b}° = ${c}°.` };
+  }
+  if (type === 'quad-find' || type === 'quad-visual') {
+    let a, b, cc, d;
+    do { a = rnd(50,120); b = rnd(50,120); cc = rnd(50,120); d = 360-a-b-cc; } while(d<20||d>340);
+    return { topic: 'Angles in a quadrilateral', topicKey: 'triangle',
+      text: `A quadrilateral has three angles: ${a}°, ${b}°, and ${cc}°. What is the fourth?`,
+      svg: svgQuad(a, b, cc), options: numWrong(d, 20, 1, 359), answer: d,
+      explanation: `Quadrilateral angles sum to 360°. So 360° − ${a}° − ${b}° − ${cc}° = ${d}°.` };
+  }
+  if (type === 'tri-concept') {
+    const qs = [
+      { q:'The sum of angles in any triangle is:', ans:'180°', opts:['90°','180°','270°','360°'], exp:'All triangles have interior angles summing to 180°.' },
+      { q:'A right triangle already has a 90° angle. What do the other two angles sum to?', ans:'90°', opts:['45°','90°','180°','270°'], exp:'180° − 90° = 90°. The two remaining angles are complementary.' },
+      { q:'An equilateral triangle has three equal angles. What is each angle?', ans:'60°', opts:['45°','60°','90°','120°'], exp:'180° ÷ 3 = 60°.' },
+    ];
+    const c = pick(qs);
+    return { topic: 'Angles in a triangle', topicKey: 'triangle', text: c.q, svg: null, options: c.opts, answer: c.ans, explanation: c.exp };
+  }
+  const qs = [
+    { q:'The sum of angles in any quadrilateral is:', ans:'360°', opts:['180°','270°','360°','540°'], exp:'All quadrilaterals have interior angles summing to 360°.' },
+    { q:'A rectangle has three 90° angles. What is the fourth?', ans:'90°', opts:['45°','60°','90°','180°'], exp:'360° − 90° − 90° − 90° = 90°.' },
+  ];
+  const c = pick(qs);
+  return { topic: 'Angles in a quadrilateral', topicKey: 'triangle', text: c.q, svg: null, options: c.opts, answer: c.ans, explanation: c.exp };
+}
+
+function qTransversal() {
+  const type = pick(['alt-int', 'corr', 'co-int', 'identify-type', 'concept']);
+  const a = rnd(35, 145);
+  const b = 180 - a;
+
+  if (type === 'alt-int') {
+    return { topic: 'Alternate interior angles', topicKey: 'transversal',
+      text: `A transversal crosses two parallel lines. One alternate interior angle is ${a}°. What is the other?`,
+      svg: svgParallel(a), options: numWrong(a, 15, 1, 179), answer: a,
+      explanation: `Alternate interior angles are equal. The other alternate interior angle is also ${a}°.` };
+  }
+  if (type === 'corr') {
+    return { topic: 'Corresponding angles', topicKey: 'transversal',
+      text: `A transversal crosses two parallel lines. A corresponding angle at the top is ${a}°. What is the corresponding angle at the bottom?`,
+      svg: svgParallel(a), options: numWrong(a, 15, 1, 179), answer: a,
+      explanation: `Corresponding angles are equal. The corresponding angle is also ${a}°.` };
+  }
+  if (type === 'co-int') {
+    return { topic: 'Co-interior angles', topicKey: 'transversal',
+      text: `A transversal crosses two parallel lines. One co-interior (same-side interior) angle is ${a}°. What is the other?`,
+      svg: svgParallel(a), options: numWrong(b, 15, 1, 179), answer: b,
+      explanation: `Co-interior angles add to 180°. So 180° − ${a}° = ${b}°.` };
+  }
+  if (type === 'identify-type') {
+    const pairs = [
+      { q: 'Angles on opposite sides of the transversal, between the parallel lines, are called:', ans: 'Alternate interior angles', opts: ['Alternate interior angles','Corresponding angles','Co-interior angles','Alternate exterior angles'] },
+      { q: 'Angles in the same position at each parallel line intersection are called:', ans: 'Corresponding angles', opts: ['Alternate interior angles','Corresponding angles','Co-interior angles','Vertically opposite angles'] },
+      { q: 'Angles on the same side of the transversal, between the parallel lines, that add to 180° are called:', ans: 'Co-interior angles', opts: ['Alternate interior angles','Corresponding angles','Co-interior angles','Alternate exterior angles'] },
+    ];
+    const p = pick(pairs);
+    return { topic: 'Parallel lines & transversals', topicKey: 'transversal', text: p.q, svg: null, options: p.opts, answer: p.ans, explanation: '' };
+  }
+  const concepts = [
+    { q: 'Alternate interior angles formed by a transversal crossing parallel lines are:', ans: 'Equal', opts: ['Equal','Supplementary','Complementary','Add to 270°'], exp: 'Alternate interior angles are always equal when lines are parallel.' },
+    { q: 'Corresponding angles formed by a transversal crossing parallel lines are:', ans: 'Equal', opts: ['Equal','Supplementary','Complementary','Reflex'], exp: 'Corresponding angles are always equal when lines are parallel.' },
+    { q: 'Co-interior angles (same-side interior) formed by a transversal crossing parallel lines add to:', ans: '180°', opts: ['90°','180°','270°','360°'], exp: 'Co-interior angles are supplementary — they add to 180°.' },
+    { q: 'A transversal is:', ans: 'A line that crosses two or more lines', opts: ['A line that is parallel to another','A line that crosses two or more lines','A line that bisects an angle','A horizontal line'], exp: 'A transversal is any line that intersects two or more other lines at distinct points.' },
+  ];
+  const c = pick(concepts);
+  return { topic: 'Parallel lines & transversals', topicKey: 'transversal', text: c.q, svg: null, options: c.opts, answer: c.ans, explanation: c.exp };
+}
+
+function qReflex() {
+  const type = pick(['find-reflex', 'classify', 'concept', 'draw-inner', 'visual']);
+
+  if (type === 'visual') {
+    const inner = rnd(30, 170);
+    const reflex = 360 - inner;
+    return { topic: 'Reflex angles', topicKey: 'reflex',
+      text: `The diagram shows a reflex angle (dashed arc). The inner angle is ${inner}°. What is the reflex angle?`,
+      svg: svgReflex(inner), options: numWrong(reflex, 20, 181, 359), answer: reflex,
+      explanation: `Reflex angle = 360° − ${inner}° = ${reflex}°.` };
+  }
+  if (type === 'find-reflex') {
+    const inner = rnd(10, 179);
+    const reflex = 360 - inner;
+    return { topic: 'Reflex angles', topicKey: 'reflex',
+      text: `The non-reflex angle at a point measures ${inner}°. What is the reflex angle?`,
+      svg: null, options: numWrong(reflex, 20, 181, 359), answer: reflex,
+      explanation: `Angles at a point sum to 360°. Reflex = 360° − ${inner}° = ${reflex}°.` };
+  }
+  if (type === 'classify') {
+    const angle = rnd(181, 359);
+    return { topic: 'Reflex angles', topicKey: 'reflex',
+      text: `An angle measures ${angle}°. What type of angle is it?`,
+      svg: null, options: shuffle(['Acute','Obtuse','Reflex','Straight']),
+      answer: 'Reflex',
+      explanation: `${angle}° is greater than 180°, so it is a reflex angle.` };
+  }
+  if (type === 'draw-inner') {
+    const reflex = rnd(181, 359);
+    const inner = 360 - reflex;
+    return { topic: 'Reflex angles', topicKey: 'reflex',
+      text: `To draw a reflex angle of ${reflex}°, you first draw the inner angle of:`,
+      svg: null, options: numWrong(inner, 15, 1, 179), answer: inner,
+      explanation: `Inner angle = 360° − ${reflex}° = ${inner}°. Draw that, then label the reflex (outer) side.` };
+  }
+  const concepts = [
+    { q: 'A reflex angle is always:', ans: 'Greater than 180°', opts: ['Less than 90°','Between 90° and 180°','Exactly 180°','Greater than 180°'], exp: 'Reflex angles are greater than 180° and less than 360°.' },
+    { q: 'To find a reflex angle, you measure the inner angle and:', ans: 'Subtract from 360°', opts: ['Add to 180°','Subtract from 360°','Multiply by 2','Add to 90°'], exp: 'Reflex = 360° − inner angle.' },
+  ];
+  const c = pick(concepts);
+  return { topic: 'Reflex angles', topicKey: 'reflex', text: c.q, svg: null, options: c.opts, answer: c.ans, explanation: c.exp };
+}
+
+const GENERATORS = {
+  types: qTypes,
+  naming: qNaming,
+  'comp-supp': qCompSupp,
+  vertical: qVertical,
+  triangle: qTriangle,
+  transversal: qTransversal,
+  reflex: qReflex,
+};
+
+const TOPIC_NAMES = {
+  types: 'Angle types',
+  naming: 'Naming & parts',
+  'comp-supp': 'Complementary & supplementary',
+  vertical: 'Vertically opposite',
+  triangle: 'Triangle & quadrilateral',
+  transversal: 'Parallel lines & transversals',
+  reflex: 'Reflex angles',
+};
+
+// ══════════════════════════════════════════════════════
+//  QUIZ STATE
+// ══════════════════════════════════════════════════════
+let questions = [], current = 0, answered = [], activeTopics = new Set(Object.keys(GENERATORS));
+let correctCount = 0, wrongCount = 0;
+let topicStats = {};
+
+function toggleTopic(el) {
+  const t = el.dataset.topic;
+  if (activeTopics.has(t)) {
+    if (activeTopics.size <= 1) return;
+    activeTopics.delete(t);
+    el.classList.remove('active');
+    el.querySelector('.check').textContent = '';
+  } else {
+    activeTopics.add(t);
+    el.classList.add('active');
+    el.querySelector('.check').textContent = '✓';
+  }
+}
+
+function buildQuestion(topicKey) {
+  let q, tries = 0;
+  do {
+    q = GENERATORS[topicKey]();
+    tries++;
+  } while ((!q || !q.options || q.options.length < 4) && tries < 10);
+  if (!q || !q.options) return null;
+  q.options = q.options.map(String).slice(0, 4);
+  if (!q.options.includes(String(q.answer))) {
+    q.options[3] = String(q.answer);
+  }
+  q.options = shuffle(q.options);
+  return q;
+}
+
+function startQuiz() {
+  const count = Math.min(100, Math.max(10, parseInt(document.getElementById('q-count').value) || 100));
+  const topics = [...activeTopics];
+
+  topicStats = {};
+  topics.forEach(t => topicStats[t] = { correct: 0, total: 0 });
+
+  questions = [];
+  for (let i = 0; i < count; i++) {
+    const t = topics[i % topics.length];
+    const q = buildQuestion(t);
+    if (q) questions.push(q);
+  }
+  shuffle(questions);
+
+  current = 0;
+  correctCount = 0;
+  wrongCount = 0;
+  answered = new Array(questions.length).fill(null);
+
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('score-screen').style.display = 'none';
+  document.getElementById('quiz-screen').style.display = 'block';
+  document.getElementById('header-score').style.display = 'block';
+  renderQ();
+}
+
+function renderQ() {
+  const q = questions[current];
+  if (!q) return;
+
+  // Header
+  document.getElementById('header-score').textContent = `${correctCount} correct · ${current + 1}/${questions.length}`;
+
+  // Progress
+  document.getElementById('progress-fill').style.width = `${((current + 1) / questions.length) * 100}%`;
+
+  // Stats
+  document.getElementById('stat-correct').textContent = correctCount;
+  document.getElementById('stat-wrong').textContent = wrongCount;
+  document.getElementById('stat-remain').textContent = questions.length - current - 1;
+
+  // Question
+  document.getElementById('q-tag').textContent = q.topic;
+  document.getElementById('q-num').textContent = `${current + 1} / ${questions.length}`;
+  document.getElementById('q-text').textContent = q.text;
+
+  // Diagram
+  const diagEl = document.getElementById('q-diagram');
+  if (q.svg) {
+    diagEl.style.display = 'flex';
+    diagEl.innerHTML = q.svg;
+  } else {
+    diagEl.style.display = 'none';
+    diagEl.innerHTML = '';
+  }
+
+  // Options
+  const optsEl = document.getElementById('options');
+  optsEl.innerHTML = '';
+  const state = answered[current];
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt;
+    if (state !== null) {
+      btn.disabled = true;
+      if (String(opt) === String(q.answer)) {
+        btn.classList.add(String(state) === String(q.answer) ? 'correct' : 'reveal');
+      } else if (String(opt) === String(state)) {
+        btn.classList.add('wrong');
+      }
+    } else {
+      btn.addEventListener('click', () => submitAnswer(String(opt)));
+    }
+    optsEl.appendChild(btn);
+  });
+
+  // Feedback
+  const fb = document.getElementById('feedback');
+  if (state !== null) {
+    const ok = String(state) === String(q.answer);
+    fb.className = 'feedback-box ' + (ok ? 'correct' : 'wrong');
+    fb.innerHTML = `<div class="feedback-label">${ok ? '✓ Correct!' : '✗ Not quite.'}</div>${q.explanation}`;
+    document.getElementById('btn-next').style.display = 'inline-block';
+  } else {
+    fb.className = 'feedback-box';
+    fb.innerHTML = '';
+    document.getElementById('btn-next').style.display = 'none';
+  }
+
+  document.getElementById('btn-prev').disabled = current === 0;
+}
+
+function submitAnswer(chosen) {
+  if (answered[current] !== null) return;
+  answered[current] = chosen;
+  const q = questions[current];
+  const ok = chosen === String(q.answer);
+  if (ok) { correctCount++; topicStats[q.topicKey].correct++; }
+  else wrongCount++;
+  topicStats[q.topicKey].total++;
+  renderQ();
+}
+
+function nextQ() {
+  if (current < questions.length - 1) { current++; renderQ(); }
+  else endQuiz();
+}
+function prevQ() {
+  if (current > 0) { current--; renderQ(); }
+}
+
+function endQuiz() {
+  document.getElementById('quiz-screen').style.display = 'none';
+  document.getElementById('score-screen').style.display = 'block';
+
+  const total = answered.filter(a => a !== null).length;
+  const pct = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+
+  document.getElementById('score-fraction').textContent = `${correctCount} / ${total}`;
+  document.getElementById('score-pct').textContent = `${pct}%`;
+
+  const msgs = [
+    'Keep practising — review each explanation and try again.',
+    'Good effort! Focus on the topics where you lost marks.',
+    'Getting there! A bit more review and you\'ll have it.',
+    'Solid work — almost there!',
+    'Great job! Strong understanding of angles.',
+    'Outstanding! Excellent work.'
+  ];
+  document.getElementById('score-msg').textContent = pct < 40 ? msgs[0] : pct < 55 ? msgs[1] : pct < 70 ? msgs[2] : pct < 80 ? msgs[3] : pct < 90 ? msgs[4] : msgs[5];
+
+  const rows = document.getElementById('topic-rows');
+  rows.innerHTML = '';
+  Object.keys(topicStats).forEach(k => {
+    const s = topicStats[k];
+    if (s.total === 0) return;
+    const p = Math.round((s.correct / s.total) * 100);
+    const color = p >= 80 ? '#1A7A4A' : p >= 60 ? '#B45309' : '#C0392B';
+    rows.innerHTML += `<div class="topic-row">
+      <span class="topic-name">${TOPIC_NAMES[k]}</span>
+      <div class="topic-bar-wrap"><div class="topic-bar-fill" style="width:${p}%;background:${color}"></div></div>
+      <span class="topic-pct" style="color:${color}">${p}%</span>
+    </div>`;
+  });
+}
+
+function restartSame() {
+  document.getElementById('score-screen').style.display = 'none';
+  startQuiz();
+}
+function showSetup() {
+  document.getElementById('score-screen').style.display = 'none';
+  document.getElementById('setup-screen').style.display = 'block';
+  document.getElementById('header-score').style.display = 'none';
+}
+</script>
+</body>
+</html>
